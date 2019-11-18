@@ -1,59 +1,83 @@
-public class hw4 implements Runnable {
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-	Account account = new Account();
+/**
+ * This program implements an animation that moves a car shape.
+ */
+public class hw4 {
+	public static void main(String[] args) throws InterruptedException {
+		JFrame frame = new JFrame();
+		frame.setSize(400, 800);
+		final MoveableShape shape = new CarShape(0, 0, CAR_WIDTH);
+		final MoveableShape shape2 = new CarShape(0, 0, CAR_WIDTH);
+		final MoveableShape shape3 = new CarShape(0, 0, CAR_WIDTH);
 
-	public static void main(String[] args) {
-		//using three different people
-		hw4 ts = new hw4();
-		Thread person1 = new Thread(ts, "person 1");
-		Thread person2 = new Thread(ts, "person 2");
-		Thread person3 = new Thread(ts, "person 3");
+		ShapeIcon icon = new ShapeIcon(shape, ICON_WIDTH, ICON_HEIGHT);
+		ShapeIcon icon2 = new ShapeIcon(shape2, ICON_WIDTH, ICON_HEIGHT);
+		ShapeIcon icon3 = new ShapeIcon(shape3, ICON_WIDTH, ICON_HEIGHT);
+		final JLabel label = new JLabel(icon);
+		final JLabel label2 = new JLabel(icon2);
+		final JLabel label3 = new JLabel(icon3);
+		frame.setLayout(new FlowLayout());
 		
-		
-		person1.start();
-		person2.start();
-		person3.start();
+		frame.add(label);
+		frame.add(label2);
+		frame.add(label3);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.pack();
+		frame.setVisible(true);
+		// goes in different speed cause of what delay you have
+
+		final int DELAY = 10;
+		final int DELAY2 = 15;
+		final int DELAY3 = 20;
+
+		// Milliseconds between timer ticks
+		Timer t = new Timer(DELAY, event -> {
+			shape.move();
+
+			label.repaint();
+
+		});
+		Timer t2 = new Timer(DELAY2, event -> {
+			shape2.move();
+			label2.repaint();
+		});
+		Timer t4 = new Timer(DELAY3, event -> {
+			shape3.move();
+			label3.repaint();
+		});
+
+//      t.start();
+//      t2.start();
+//      t4.start();
+		Thread t1 = new Thread(new Runnable() {
+			public void run() {
+				t.start();
+			}
+		});
+		Thread t3 = new Thread(new Runnable() {
+			public void run() {
+				t2.start();
+			}
+		});
+		Thread t5 = new Thread(new Runnable() {
+			public void run() {
+				t4.start();
+			}
+		});
+
+		t1.start();
+		t1.sleep(200);// speed of the car
+		t3.start();
+		t3.sleep(600);
+		t5.start();
+		t5.sleep(500);
 	}
 
-	@Override
-	public void run() {
-		for (int i = 0; i < 3; i++) {
-			withDraw(100);
-			if (account.getBalance() < 0) {
-				System.out.println("The account is overdrawn!");
-			}
-			deposit(200);
-		}
-	}
-	
-    //synchronized methods below:-
-	private synchronized void deposit(int balance) {
-		if (balance > 0) {
-			System.out.println(Thread.currentThread().getName() + " " + " is trying to deposit");
-			try {
-				Thread.sleep(200);//the time intervals
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			account.deposit(balance);
-			System.out.println(Thread.currentThread().getName() + " " + "The Deposit is Successful");
-		} else {
-			System.out.println(Thread.currentThread().getName() + " " + "The Deposit is Unsuccessful");
-		}
-	}
+	private static final int ICON_WIDTH = 400;
+	private static final int ICON_HEIGHT = 200;
+	private static final int CAR_WIDTH = 100;
 
-	private synchronized void withDraw(int bal1) {
-		if (account.getBalance() >= bal1) {
-			System.out.println(Thread.currentThread().getName() + " " + " is trying to withdraw");
-			try {
-				Thread.sleep(200);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			account.withdraw(bal1);
-			System.out.println(Thread.currentThread().getName() + " " + "The Withdrawal is Successful");
-		} else {
-			System.out.println(Thread.currentThread().getName() + " " + " The balance is low");
-		}
-	}
 }
